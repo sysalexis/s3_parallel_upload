@@ -19,6 +19,11 @@ aws s3 mb s3://$BUCKET
 - Add one default Instance Store volume to store the 5GB of data. It also makes a great demonstration of ephemeral storage.
 - Make sure the instance is in the same Region as the Bucket!
 
+```
+Should we add a AWS CLI script for these steps (Role, SG, KP, Instance) ?
+Or a cloudformation template ?
+```
+
 ##Step 3: Login to EC2 and setup environment
 I paste these commands into the Command Line. It downloads GNU Parallel and flicks to the ephemeral storage.
 
