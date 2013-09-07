@@ -3,11 +3,13 @@
 **Purpose**: Demonstrate that S3 is massively parallel.   
 **Summary**: This demonstration uploads 500 x 10MB files (5GB total). When done sequentially, it takes 18 minutes. When done in parallel, it takes 70 seconds.
 
+Do not confuse parallel uploads with [multipart uploads](http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html)
+
 ##Step 1: Create a bucket for storing files
 The Region for the bucket should match the Region used for EC2 in the next step. I also add a Lifecycle rule to expire files after 0 days, just to keep things clean.
 
 ##Step 2: Launch a Linux m2.4XL instance with ephemeral storage in the same Region
-- Use m2.4XL to avoid network bandwidth problems
+- Use ``m2.4XL`` to avoid network bandwidth problems
 - Give it a Role with permissions to access your S3 Bucket
 - Add one default Instance Store volume to store the 5GB of data. It also makes a great demonstration of ephemeral storage.
 - Make sure the instance is in the same Region as the Bucket!
@@ -37,7 +39,7 @@ for num in $(seq 1 500); do dd if=/dev/zero of=file-${num} bs=1M count=10; done
 Be sure to substitute YOUR_REGION and YOUR_BUCKET.
 ```
 # Sequential upload
-time for ob in *; do echo ${ob}; aws s3 put-object --region YOUR_REGION --bucket YOUR_BUCKET --key s-${ob} --body ${ob}; done
+time for ob in *; do echo ${ob}; aws s3 $ob s3://seq-$BUCKET; done
 ````
 
 This should take approximately 18 minutes. Go back to teaching the course and come back later to see the result. It will look something like this:
@@ -53,16 +55,16 @@ sys		0m44.327s
 Be sure to substitute YOUR_REGION and YOUR_BUCKET.
 ```
 # Parallel upload
-time ls * | parallel -j500 aws s3 put-object --region YOUR_REGION --bucket YOUR_BUCKET --key p-{1} --body {1}
+time ls * | parallel -j500 aws s3 $ob s3://par-$BUCKET 
 ```
 The result will look like:
 ```
 real	1m12.777s
 user	7m59.842s
-sys	1m4.388s
+sys	  1m4.388s
 ```
 
-Bottom line: Parallel uploads on S3 are much faster than sequential uploads
+**Bottom line**: Parallel uploads on S3 are much faster than sequential uploads
 
 ## Credits
 
